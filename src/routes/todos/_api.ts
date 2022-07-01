@@ -1,39 +1,49 @@
-import type { RequestEvent } from "@sveltejs/kit"
+import type { RequestEvent } from '@sveltejs/kit'
+import PrismaClient from '$lib/prisma'
 
-// TODO: Persist in database
-let todos: Todo[] = []
+const prisma = new PrismaClient()
 
-export const api = (event: RequestEvent, data?: Record<string, unknown>) => {
+export const api = async (event: RequestEvent, data?: Record<string, unknown>) => {
     let body = {}
     let status = 500
     switch (event.request.method.toUpperCase()) {
         case 'GET':
-            body = todos
+            body = await prisma.todo.findMany()
             status = 200
             break
         case 'POST':
             if (data) {
-                todos.push(data as Todo)
-                body = data
+                body = await prisma.todo.create({ 
+                    data: { 
+                        created_at: data.created_at as Date,
+                        done: data.done as boolean,
+                        text: data.text as string
+                    }
+                })
                 status = 201
             }
             break
         case 'DELETE':
-            todos = todos.filter(todo => todo.uid !== event.params.uid)
+            body = await prisma.todo.delete({
+                where: {
+                    uid: event.params.uid
+                }
+            })
             status = 200
             break
         case 'PATCH':
             if (data) {
-                todos = todos.map(todo => {
-                    if (todo.uid === event.params.uid) {
-                        if (data.text) todo.text = data.text as string
-                        else todo.done = data.done as boolean
+                body = await prisma.todo.update({
+                    where: {
+                        uid: event.params.uid
+                    },
+                    data: {
+                        done: data.done as boolean,
+                        text: data.text as string
                     }
-                    return todo
                 })
             }
             status = 200
-            body = todos.find(todo => todo.uid === event.params.uid) as object
             break
         default:
             break
