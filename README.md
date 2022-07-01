@@ -1,5 +1,7 @@
 # Full Stack Web Development in the Cloud Course
 
+## https://www.freecodecamp.org/news/become-a-full-stack-developer-with-svelte/
+
 ## https://www.youtube.com/watch?v=OUzaUJ3gEug
 
 # create-svelte
