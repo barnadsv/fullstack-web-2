@@ -10,7 +10,9 @@ export const del = (event: RequestEvent) => {
 export async function patch(event: RequestEvent) {
     const formData = await event.request.formData()
     const texto = formData.get('text')?.toString()
+    const done = formData.get('done') ? !!formData.get('done') : undefined
     return api(event, {
-        text: texto
+        text: texto,
+        done
     })
 }
